@@ -1,3 +1,6 @@
+//palindrome number
+//Author: Leonard Pan
+
 #include <iostream>
 #include <cmath>
 using namespace std;
