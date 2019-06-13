@@ -1,6 +1,32 @@
 #include <deque>
+
+int decDigitalVec[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+
 class Solution {
 public:
+    int _getDigitalCount(int x) {
+        int counts = 0;
+        while(x != 0) {
+            if(x >= 10000) {
+                x /= 10000;
+                counts += 4;
+            }
+            else if(x >= 100) {
+                x /= 100;
+                counts += 2;
+            }
+            else if(x >= 10) {
+                x = 0;
+                counts += 2;
+            }
+            else {
+                x = 0;
+                ++counts;
+            }
+        }
+        return counts;
+    }
+    
     bool isPalindrome(int x) {
         //all negtive numbers are not palindromes
         if (x < 0) {
@@ -10,24 +36,16 @@ public:
         else if (x < 10) {
             return true;
         }
-        //split all digitals into a queue
-        std::deque<int> q;
-        while(x != 0) {
-            q.push_back(x % 10);
-            x /= 10;
-        }
-        //compare 2 digitals in each loop
-        int count = q.size();
-        while(count > 1) {
-            //left != right, it's not a palindrome number
-            if(q.front() != q.back()) {
+        int digitalCount = _getDigitalCount(x);
+        while (digitalCount > 1) {
+            int topDigit = x / decDigitalVec[digitalCount - 1];
+            x -= topDigit * decDigitalVec[digitalCount - 1];
+            if (x % 10 != topDigit) {
                 return false;
             }
-            q.pop_front();
-            q.pop_back();
-            count -= 2;
+            x /= 10;
+            digitalCount -= 2;
         }
-        //only one or zero digital left, it's a palindrome number
         return true;
     }
 };
