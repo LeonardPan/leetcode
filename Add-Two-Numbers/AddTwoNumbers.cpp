@@ -1,54 +1,61 @@
-//Add Two Numbers
-//Author: Leonard Pan
-
-#include <iostream>
-using namespace std;
-
-
-typedef struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-}ListNode;
-
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
 class Solution {
 public:
-    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
-        // Start typing your C/C++ solution below
-        // DO NOT write int main() function
-        ListNode *lNext = l1, *rNext = l2;
-        ListNode *mNext = NULL, *mLast = NULL, *mHead = NULL;
-        int carry = 0, value = 0;
-        while(lNext || rNext || carry){
-            value = ((lNext != NULL? lNext->val:0 )
-                    + (rNext != NULL? rNext->val:0 )
-                    + carry) % 10;
-            carry =  ((lNext != NULL? lNext->val:0 )
-                    + (rNext != NULL? rNext->val:0 )
-                    + carry) / 10;
-            mNext = new ListNode(value);
-            if(NULL == mLast){
-                mLast = mNext;
-            	mHead = mNext;
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        int sum = 0;
+        ListNode* pRoot = NULL;
+        ListNode* pCurrent = NULL;
+        while (l1 && l2) {
+            //l1 + l2 + carry
+            sum = l1->val + l2->val + sum;
+            //save the unit
+            ListNode* pTmp = new ListNode(sum % 10);
+            //save the carry
+            sum = sum / 10;
+            //this is the 1st node
+            if (!pCurrent) {
+                pCurrent = pTmp;
+                pRoot = pCurrent;
             }
-            else{
-                mLast->next = mNext;
-    			mLast = mNext;
-        	}
-        	if(lNext) lNext = lNext->next;
-        	if(rNext) rNext = rNext->next;
+            //not the 1st node
+            else {
+                pCurrent->next = pTmp;
+                pCurrent = pTmp;
+            }
+            l1 = l1->next;
+            l2 = l2->next;
         }
-        return mHead;
+        //append all left nodes behind the current node
+        ListNode* pLeftRoot = l1 ? l1 : l2;
+        if (pLeftRoot) {
+            if (pCurrent) {
+                pCurrent->next = pLeftRoot;
+                //consider the carray bit
+                while (sum && pCurrent->next) {
+                    sum += pCurrent->next->val;
+                    pCurrent->next->val = sum % 10;
+                    sum = sum / 10;
+                    pCurrent = pCurrent->next;
+                }
+                if (sum) {
+                    pCurrent->next = new ListNode(sum);
+                }
+            }
+            //if l2 is empty, use the whole l1 as result
+            else {
+                pRoot = l1;
+            }
+        }
+        else if (sum) {
+            pCurrent->next = new ListNode(sum);
+        }
+        return pRoot;
     }
 };
-
-int main() {
-    // Start typing your code here...
-	Solution *sol = new Solution();
-	ListNode *left = new ListNode(9);
-	left->next = new ListNode(9);
-	ListNode *right = new ListNode(1);
-	ListNode *merged = sol->addTwoNumbers(left, right);
-
-    return 0;
-}
