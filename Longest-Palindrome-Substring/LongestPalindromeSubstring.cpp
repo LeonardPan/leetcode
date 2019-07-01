@@ -1,84 +1,60 @@
-//longest palindromic substring 
-//Author: Leonard Pan
-
-// Type your C++ code and click the "Run Code" button!
-// Your code output will be shown on the left.
-// Click on the "Show input" button to enter input data to be read (from stdin).
-
-#include <iostream>
-#include <string>
-using namespace std;
-
 class Solution {
-private:
-    bool isPalindromicStr[1010][1010];
 public:
-    Solution(){
-        init(1010);
-    }
-    void init(int len){
-        int i, j;
-        for(i = 0; i < len; ++i)
-        {
-            for(j = 0; j < len; ++j)
-            {
-                if(i == j)
-                    isPalindromicStr[i][j] = true;
-                else
-                    isPalindromicStr[i][j] = false;
-            }
-        }
-    }
     string longestPalindrome(string s) {
-        // Start typing your C/C++ solution below
-        // DO NOT write int main() function
-        //init();
-        int max_len = s.length();
-        int i, longestSubstrIndex=0, longestSubstrLen=1;
-        for(i = 1; i < max_len; ++i)
+        int length = s.size();
+        string longestStr;
+        for (size_t i = 0; i < length; ++i)
         {
-            if(s[i] == s[i-1])
+            if ((i + 1) * 2 < longestStr.size()) {
+                break;
+            }
+            //treat [i] as the center of the paradrome
+            string currentStr = string(1, s[i]);
+            if (longestStr.size() < 1) {
+                longestStr = currentStr;
+            }
+            for (int left = i - 1, right = i + 1;
+                left >= 0 && right < length;
+                --left, ++right)
             {
-                isPalindromicStr[i-1][i] = true;
-                if(longestSubstrLen < 2)
+                //valid paradrome string
+                if (s[left] == s[right])
                 {
-                    longestSubstrLen = 2;
-                    longestSubstrIndex = i-1;
+                    currentStr = s[left] + currentStr + s[right];
+                    if (currentStr.size() > longestStr.size()) {
+                        longestStr = currentStr;
+                    }
                 }
-            }  
-        }
-        
-        int len;
-        for(len = 3; len <= max_len; ++len)
-        {
-            for(i = 0; i <= max_len - len; ++i)
-            {
-                if((s[i] == s[i+len-1]) && isPalindromicStr[i+1][i+len-2])
+                //invalid paradrome string
+                else {
+                    break;
+                }
+            }
+            if (i < length - 1 && s[i] == s[i + 1]) {
+                //treat [i, i+1] as the center of the paradrome
+                currentStr = string(1, s[i]) + s[i + 1];
+                if (longestStr.size() < 2) {
+                    longestStr = currentStr;
+                }
+                for (int left = i - 1, right = i + 2;
+                    left >= 0 && right < length;
+                    --left, ++right)
                 {
-                    isPalindromicStr[i][i+len-1] = true;
-                    if(longestSubstrLen < len)
+                    //valid paradrome string
+                    if (s[left] == s[right])
                     {
-                        longestSubstrLen = len;
-                        longestSubstrIndex = i;
+                        currentStr = s[left] + currentStr + s[right];
+                        if (currentStr.size() > longestStr.size()) {
+                            longestStr = currentStr;
+                        }
+                    }
+                    //invalid paradrome string
+                    else {
+                        break;
                     }
                 }
             }
         }
-        init(max_len);
-        return s.substr(longestSubstrIndex, longestSubstrLen);
+        return longestStr;
     }
 };
-
-int main() {
-    // Start typing your code here...
-    Solution* pSo = new Solution();
-    string strIn;
-    while(cin >> strIn)
-    {
-        if(0 == strIn.compare("exit"))
-            break;
-        cout << pSo->longestPalindrome(strIn) << endl;
-    }
-    
-    return 0;
-}
